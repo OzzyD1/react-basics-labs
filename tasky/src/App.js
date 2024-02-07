@@ -15,6 +15,7 @@ function App() {
                 id: 1,
                 title: "Dishes",
                 description: "Empty dishwasher",
+                priority: "High",
                 deadline: "Today",
                 done: false,
             },
@@ -22,6 +23,7 @@ function App() {
                 id: 2,
                 title: "Laundry",
                 description: "Fold clothes and put away",
+                priority: "Medium",
                 deadline: "Tomorrow",
                 done: false,
             },
@@ -29,6 +31,7 @@ function App() {
                 id: 3,
                 title: "Tidy up",
                 description: "Tidy up the living room",
+                priority: "High",
                 deadline: "Today",
                 done: false,
             },
@@ -36,6 +39,7 @@ function App() {
                 id: 4,
                 title: "Hoover",
                 description: "Hoover the living room",
+                priority: "Low",
                 deadline: "Today",
                 done: false,
             },
@@ -43,6 +47,7 @@ function App() {
                 id: 5,
                 title: "Wipe down surfaces",
                 description: "Wipe down the kitchen surfaces",
+                priority: "High",
                 deadline: "Tomorrow",
                 done: false,
             },
@@ -52,6 +57,7 @@ function App() {
     const [formState, setFormState] = useState({
         title: "",
         description: "",
+        priority: "",
         deadline: "",
     });
 
@@ -64,6 +70,9 @@ function App() {
                 break;
             case "description":
                 form.description = event.target.value;
+                break;
+            case "priority":
+                form.priority = event.target.value;
                 break;
             case "deadline":
                 form.deadline = event.target.value;
@@ -98,6 +107,21 @@ function App() {
         tasks.push(form);
         setTaskState({ tasks });
     };
+
+    // const setChipColour = (priorityColour) => {
+    //     switch (priorityColour) {
+    //         case "High":
+    //             priorityColour: "Red";
+    //             break;
+    //         case "Medium":
+    //             priorityColour: "Yellow";
+    //             break;
+    //         case "Low":
+    //             priorityColour: "Blue";
+    //             break;
+    //         default:
+    //     }
+    // };
 
     return (
         <div className="container">
@@ -134,6 +158,7 @@ function App() {
                             title={task.title}
                             description={task.description}
                             deadline={task.deadline}
+                            priority={task.priority}
                             done={task.done}
                             key={task.id}
                             markDone={() => doneHandler(index)}

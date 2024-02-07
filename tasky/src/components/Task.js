@@ -7,6 +7,7 @@ import CardContent from "@mui/material/CardContent";
 import CardHeader from "@mui/material/CardHeader";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
 
 const Task = (props) => {
     return (
@@ -52,6 +53,17 @@ const Task = (props) => {
                     >
                         {props.description}
                     </Typography>
+                    <Chip
+                        label={props.priority}
+                        sx={{
+                            backgroundColor:
+                                props.priority === "High"
+                                    ? "red"
+                                    : props.priority === "Medium"
+                                    ? "Yellow"
+                                    : "blue",
+                        }}
+                    />
                 </CardContent>
                 <CardActions
                     sx={{ justifyContent: "space-between", padding: "20px" }}
