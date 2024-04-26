@@ -1,65 +1,29 @@
-// import logo from "./logo.svg";
 import "./App.css";
+import React, { useState, useEffect } from "react";
 import Task from "./components/Task";
-import React, { useState } from "react";
 import AddTaskForm from "./components/Form";
-import { v4 as uuidv4 } from "uuid";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
+import { getTasks, addTask, deleteTask, updateTask } from "./api/tasky-api";
 
 function App() {
-    const [taskState, setTaskState] = useState({
-        tasks: [
-            {
-                id: 1,
-                title: "Dishes",
-                description: "Empty dishwasher",
-                priority: "High",
-                deadline: "Today",
-                done: false,
-            },
-            {
-                id: 2,
-                title: "Laundry",
-                description: "Fold clothes and put away",
-                priority: "Medium",
-                deadline: "Tomorrow",
-                done: false,
-            },
-            {
-                id: 3,
-                title: "Tidy up",
-                description: "Tidy up the living room",
-                priority: "High",
-                deadline: "Today",
-                done: false,
-            },
-            {
-                id: 4,
-                title: "Hoover",
-                description: "Hoover the living room",
-                priority: "Low",
-                deadline: "Today",
-                done: false,
-            },
-            {
-                id: 5,
-                title: "Wipe down surfaces",
-                description: "Wipe down the kitchen surfaces",
-                priority: "High",
-                deadline: "Tomorrow",
-                done: false,
-            },
-        ],
-    });
+    const [taskState, setTaskState] = useState({ tasks: [] });
+
+    useEffect(() => {
+        getTasks().then((tasks) => {
+            setTaskState({ tasks: tasks });
+        });
+    }, []);
 
     const [formState, setFormState] = useState({
         title: "",
         description: "",
-        priority: "",
         deadline: "",
+        priority: "Low",
     });
+
+    //console.log(formState);
 
     const formChangeHandler = (event) => {
         let form = { ...formState };
@@ -71,57 +35,42 @@ function App() {
             case "description":
                 form.description = event.target.value;
                 break;
-            case "priority":
-                form.priority = event.target.value;
-                break;
             case "deadline":
                 form.deadline = event.target.value;
+                break;
+            case "priority":
+                form.priority = event.target.value;
                 break;
             default:
                 form = formState;
         }
         setFormState(form);
     };
-    console.log(formState);
+
+    const formSubmitHandler = async (event) => {
+        event.preventDefault();
+
+        const tasks = taskState.tasks ? [...taskState.tasks] : [];
+        const form = { ...formState };
+        const newTask = await addTask(form);
+        tasks.push(newTask);
+        setTaskState({ tasks });
+    };
 
     const doneHandler = (taskIndex) => {
         const tasks = [...taskState.tasks];
         tasks[taskIndex].done = !tasks[taskIndex].done;
+        updateTask(tasks[taskIndex]);
         setTaskState({ tasks });
     };
 
     const deleteHandler = (taskIndex) => {
         const tasks = [...taskState.tasks];
+        const id = tasks[taskIndex]._id;
         tasks.splice(taskIndex, 1);
+        deleteTask(id);
         setTaskState({ tasks });
     };
-
-    const formSubmitHandler = (event) => {
-        event.preventDefault();
-
-        const tasks = [...taskState.tasks];
-        const form = { ...formState };
-
-        form.id = uuidv4();
-
-        tasks.push(form);
-        setTaskState({ tasks });
-    };
-
-    // const setChipColour = (priorityColour) => {
-    //     switch (priorityColour) {
-    //         case "High":
-    //             priorityColour: "Red";
-    //             break;
-    //         case "Medium":
-    //             priorityColour: "Yellow";
-    //             break;
-    //         case "Low":
-    //             priorityColour: "Blue";
-    //             break;
-    //         default:
-    //     }
-    // };
 
     return (
         <div className="container">
@@ -145,29 +94,35 @@ function App() {
                 </Typography>
             </Container>
             {/* End App Header */}
+
             {/* Task Card Grid */}
             <Container maxWidth="md" component="main">
-                <Grid
-                    container
-                    spacing={5}
-                    alignItems="flex-top"
-                    justifyContent="center"
-                >
-                    {taskState.tasks.map((task, index) => (
-                        <Task
-                            title={task.title}
-                            description={task.description}
-                            deadline={task.deadline}
-                            priority={task.priority}
-                            done={task.done}
-                            key={task.id}
-                            markDone={() => doneHandler(index)}
-                            deleteTask={() => deleteHandler(index)}
-                        />
-                    ))}
-                </Grid>
+                {taskState.tasks ? (
+                    <Grid
+                        container
+                        spacing={5}
+                        alignItems="flex-top"
+                        justifyContent="center"
+                    >
+                        {taskState.tasks.map((task, index) => (
+                            <Task
+                                title={task.title}
+                                description={task.description}
+                                deadline={task.deadline}
+                                done={task.done}
+                                priority={task.priority}
+                                key={task._id}
+                                markDone={() => doneHandler(index)}
+                                deleteTask={() => deleteHandler(index)}
+                            />
+                        ))}
+                    </Grid>
+                ) : (
+                    <p>No Tasks to do - have a cup of tea and a biscuit!</p> // You can render a placeholder or a message if the array is empty
+                )}
             </Container>
             {/* End Task Card Grid */}
+
             {/* Footer - Add Task Form */}
             <Container
                 component="footer"
